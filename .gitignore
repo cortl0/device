@@ -1,4 +1,4 @@
-./src/bynary_neurons_network
+./src/binary_neurons_network
 ./src/gpio
 
 # C++ objects and libs

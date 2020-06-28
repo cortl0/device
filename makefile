@@ -1,5 +1,5 @@
 TARGET = prepare
-BBN_DIR = ./src/bynary_neurons_network
+BBN_DIR = ./src/binary_neurons_network
 GPIO_DIR = ./src/gpio
 
 .PHONY: prepare all clean

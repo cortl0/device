@@ -14,7 +14,7 @@
 class dto_bpi : public serializable
 {
 public:
-    int x, y;
+    short front_distance, rear_distance, motor_state;
     virtual ~dto_bpi();
     dto_bpi();
     virtual void serialize(char* array, short& offset);

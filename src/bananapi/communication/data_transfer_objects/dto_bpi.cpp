@@ -22,8 +22,9 @@ void dto_bpi::serialize(char* array, short& offset)
 {
     crc = 0;
     converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&name), NAME_LENGTH, crc);
-    converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&x), sizeof (x), crc);
-    converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&y), sizeof (y), crc);
+    converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&front_distance), sizeof (front_distance), crc);
+    converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&rear_distance), sizeof (rear_distance), crc);
+    converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&motor_state), sizeof (motor_state), crc);
     converter::object_to_bytes(array, offset, reinterpret_cast<void*>(&crc), sizeof (crc), crc);
 }
 
@@ -35,8 +36,9 @@ bool dto_bpi::deserialize(char* array, short& offset)
     for(int i = 0; i < NAME_LENGTH; i++)
         if(name_data[i] != name[i])
             return false;
-    converter::bytes_to_object(array, offset, reinterpret_cast<void*>(&x), sizeof (x), crc);
-    converter::bytes_to_object(array, offset, reinterpret_cast<void*>(&y), sizeof (y), crc);
+    converter::bytes_to_object(array, offset, reinterpret_cast<void*>(&front_distance), sizeof (front_distance), crc);
+    converter::bytes_to_object(array, offset, reinterpret_cast<void*>(&rear_distance), sizeof (rear_distance), crc);
+    converter::bytes_to_object(array, offset, reinterpret_cast<void*>(&motor_state), sizeof (motor_state), crc);
     converter::bytes_to_object(array, offset, reinterpret_cast<void*>(&crc_data), sizeof (crc_data), crc_dummy);
     return crc_data == crc;
 }

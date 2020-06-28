@@ -6,11 +6,13 @@
  *   licensed by GPL v3.0
  */
 
-#include <iostream>
+#include "device.h"
 
 int main()
 {
-    std::cout << "see the unit test" << std::endl;
+    device dev;
+
+    dev.start();
 
     return 0;
 }
