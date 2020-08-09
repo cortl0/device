@@ -1,13 +1,10 @@
-//*************************************************************//
-//                                                             //
-//   binary neurons network                                    //
-//   created by Ilya Shishkin                                  //
-//   cortl@8iter.ru                                            //
-//   http://8iter.ru/ai.html                                   //
-//   https://github.com/cortl0/binary_neurons_network          //
-//   licensed by GPL v3.0                                      //
-//                                                             //
-//*************************************************************//
+/*
+ *   device
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/device
+ *   licensed by GPL v3.0
+ */
 
 #include "brain_friend.h"
 
@@ -15,6 +12,7 @@
 
 void brain_friend::save()
 {
+#ifdef under_development
     std::ofstream out(fs::current_path() / "storage.bnn", std::ios::binary);
 
     if(out.is_open())
@@ -42,10 +40,12 @@ void brain_friend::save()
         out << brain_.rndm->debug_count_put;
         out << brain_.rndm->debug_count_get;
     }
+#endif
 }
 
 void brain_friend::load()
 {
+#ifdef under_development
     std::ifstream in(fs::current_path() / "storage.bnn", std::ios::binary);
 
     if(in.is_open())
@@ -92,6 +92,7 @@ void brain_friend::load()
         in >> brain_.rndm->debug_count_put;
         in >> brain_.rndm->debug_count_get;
     }
+#endif
 }
 
 void brain_friend::stop()

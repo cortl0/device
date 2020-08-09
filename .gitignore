@@ -1,5 +1,7 @@
 ./src/binary_neurons_network
 ./src/gpio
+./device_schematic_diagram.drawio
+*.out
 
 # C++ objects and libs
 *.slo

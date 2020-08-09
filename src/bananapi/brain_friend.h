@@ -1,13 +1,10 @@
-//*************************************************************//
-//                                                             //
-//   binary neurons network                                    //
-//   created by Ilya Shishkin                                  //
-//   cortl@8iter.ru                                            //
-//   http://8iter.ru/ai.html                                   //
-//   https://github.com/cortl0/binary_neurons_network          //
-//   licensed by GPL v3.0                                      //
-//                                                             //
-//*************************************************************//
+/*
+ *   device
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/device
+ *   licensed by GPL v3.0
+ */
 
 #ifndef BRAIN_FRIEND_H
 #define BRAIN_FRIEND_H

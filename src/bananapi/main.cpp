@@ -10,9 +10,7 @@
 
 int main()
 {
-    device dev;
-
-    dev.start();
+    device().run();
 
     return 0;
 }

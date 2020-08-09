@@ -35,11 +35,13 @@ Schematic diagram of the device in drawio file format
 Ilya Shishkin  
 mailto:cortl@8iter.ru
 
-## Home page
+## Links
 http://8iter.ru/ai.html
-
-## GitHub reference
+https://t.me/artificial_intelligence_bnn
+https://t.me/artificial_intelligence_bnn_grp
 https://github.com/cortl0/device
 
 ## License
 This project is licensed under the GPL v3.0 - see the LICENSE file for details
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DPXPWAL9BQD8Q)
