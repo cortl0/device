@@ -36,9 +36,9 @@ Ilya Shishkin
 mailto:cortl@8iter.ru
 
 ## Links
-http://8iter.ru/ai.html
-https://t.me/artificial_intelligence_bnn
-https://t.me/artificial_intelligence_bnn_grp
+http://8iter.ru/ai.html  
+https://t.me/artificial_intelligence_bnn  
+https://t.me/artificial_intelligence_bnn_grp  
 https://github.com/cortl0/device
 
 ## License
