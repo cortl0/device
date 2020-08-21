@@ -14,8 +14,8 @@ chassis::chassis()
   DDRD = DDRD | motor_right.pin_config() << 2;
   PORTB = PORTB & B11000000;
   PORTD = PORTD & B11;
-  cntrl = new control_time_step();
-  //cntrl = new control_remote();
+  //cntrl = new control_time_step();
+  cntrl = new control_remote();
 }
 
 void chassis::refrash_state()

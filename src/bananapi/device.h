@@ -17,10 +17,8 @@ class device
 {
     short front_distanse = 0;
     short rear_distanse = 0;
-    _word random_array_length_in_power_of_two = 20;
-    _word quantity_of_neurons_in_power_of_two = 14;
-    _word input_length = 32;
-    _word output_length = 4;
+
+    volatile bool stop = false;
 
     cpu _cpu;
 
@@ -29,14 +27,16 @@ class device
 
     std::unique_ptr<brain> brn;
     std::unique_ptr<brain_friend> brn_frnd;
+    std::unique_ptr<std::thread> button_thread;
 
     static void brain_clock_cycle_handler(void* owner);
+    static void button_thread_func(device* owner);
     void read_sensor_state();
     void write_motor_state();
 
 public:
     device();
-    [[noreturn]] void run();
+    void run();
 };
 
 #endif // DEVICE_H

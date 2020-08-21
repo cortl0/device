@@ -18,12 +18,14 @@ namespace fs = std::experimental::filesystem;
 struct brain_friend
 {
     brain &brain_;
-    void save();
-    void load();
-    void stop();
-    void resize(_word brainBits);
+
     brain_friend() = delete;
-    brain_friend(brain &brain_) : brain_(brain_) {}
+    brain_friend(brain &brain_);
+    std::string get_state();
+    void load();
+    void resize(_word brainBits);
+    void save();
+    void stop();
 };
 
 #endif // BRAIN_FRIEND_H

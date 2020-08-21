@@ -30,15 +30,11 @@ class hc_sr04
     uword pin_trigger_dat_reg;
     uword pin_trigger_dat_bit;
 
+    // distance in centimeters
+    short distance;
+
     cpu& _cpu;
 
-    std::chrono::microseconds start, end;
-
-    // signal travel time
-    std::chrono::microseconds duration;
-    
-    // distance in centimeters
-    short distance = 0;
 public:
     enum
     {
@@ -54,11 +50,11 @@ public:
             uword pin_trigger_cfg_reg, uword pin_trigger_cfg_bit,
             uword pin_trigger_dat_reg, uword pin_trigger_dat_bit,
             cpu& _cpu);
-
-    void run();
     
     // get the distance in centimeters
     short get_distance();
+
+    void run();
 };
 
 #endif // HC_SR04_H

@@ -36,26 +36,21 @@ short hc_sr04::get_distance()
     if(hc_sr04_state_allow_new_data != state)
         return 0;
 
-    distance = static_cast<short>(duration.count() / HC_SR04_COEFFICIENT);
-
-    if(distance > 400)
-        distance = 0;
-
     state = hc_sr04_state_not_new_data;
-
-#if DEBUG
-    std::cout << "distance = " << distance << std::endl;
-#endif
 
     return distance;
 }
 
 void hc_sr04::run()
 {
+    // start time, end time, signal travel time
+    static std::chrono::microseconds start, end, duration;
+
     switch (state)
     {
     case hc_sr04_state_in_work:
         return;
+
     case hc_sr04_state_not_new_data:
     case hc_sr04_state_allow_new_data:
 
@@ -72,19 +67,19 @@ void hc_sr04::run()
         while(!_cpu.read_bit(pin_echo_dat_reg, pin_echo_dat_bit) && count_error-- > 0);
 
         start = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch());
+                    std::chrono::system_clock::now().time_since_epoch());
 
         while(_cpu.read_bit(pin_echo_dat_reg, pin_echo_dat_bit) && count_error-- > 0);
 
         end = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch());
+                    std::chrono::system_clock::now().time_since_epoch());
 
         duration = end - start;
 
-#if DEBUG
-        std::cout << "duration = " << static_cast<long long>(duration.count()) << std::endl;
-        std::cout << "count_error = " << std::to_string(count_error) << std::endl;
-#endif
+        distance = static_cast<short>(duration.count() / HC_SR04_COEFFICIENT);
+
+        if(distance > 400)
+            distance = 0;
 
         state = hc_sr04_state_allow_new_data;
 

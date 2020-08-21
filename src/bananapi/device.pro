@@ -11,7 +11,7 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
-#LIBS += -lstdc++fs
+LIBS += -lstdc++fs
 LIBS += -pthread
 #LIBS += -lboost_system
 
