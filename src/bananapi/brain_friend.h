@@ -21,6 +21,7 @@ struct brain_friend
 
     brain_friend() = delete;
     brain_friend(brain &brain_);
+    _word get_quantity_of_initialized_neurons_binary();
     std::string get_state();
     void load();
     void resize(_word brainBits);

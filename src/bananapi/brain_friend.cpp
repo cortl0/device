@@ -6,13 +6,18 @@
  *   licensed by GPL v3.0
  */
 
-#define under_development
+//#define under_development
 
 #include "brain_friend.h"
 
 #include <fstream>
 
 brain_friend::brain_friend(brain &brain_) : brain_(brain_) {}
+
+_word brain_friend::get_quantity_of_initialized_neurons_binary()
+{
+    return brain_.quantity_of_initialized_neurons_binary;
+}
 
 std::string brain_friend::get_state()
 {

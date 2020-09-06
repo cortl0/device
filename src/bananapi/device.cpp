@@ -8,8 +8,6 @@
 
 #include "device.h"
 
-#define DEBUG 1
-
 device::device()
 {
     hc_sr04_front.reset(new hc_sr04(CON2_P31_CFG_REG, CON2_P31_CFG_BIT, CON2_P31_DAT_REG, CON2_P31_DAT_BIT,
@@ -41,19 +39,25 @@ device::device()
     // stop and save button
     _cpu.write_bits(CON2_P10_CFG_REG, CON2_P10_CFG_BIT, P_SELECT_INPUT, P_SELECT_LENGTH);
     _cpu.write_bits(CON2_P10_PUL_REG, CON2_P10_PUL_BIT, P_PULL_DOWN, P_PULL_LENGTH);
+
+    // led count binary neurons init
+    _cpu.write_bits(CON2_P07_CFG_REG, CON2_P07_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+    _cpu.write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+}
+
+cpu& device::get_cpu()
+{
+    return _cpu;
+}
+
+uword device::get_quantity_of_initialized_neurons_binary()
+{
+    return brn_frnd->get_quantity_of_initialized_neurons_binary();
 }
 
 void device::brain_clock_cycle_handler(void* owner)
 {
-#if DEBUG
-    static int count = 16;
-
-    if(count-- < 0)
-    {
-        std::cout << static_cast<device*>(owner)->brn_frnd->get_state() << std::endl;
-        count = 16;
-    }
-#endif
+    static_cast<device*>(owner)->log_cycle();
 
     static_cast<device*>(owner)->write_motor_state();
 
@@ -79,6 +83,39 @@ void device::button_thread_func(device* owner)
     }
 }
 
+static void led_work(device* d, bool* stop)
+{
+    while(!(*stop))
+    {
+        for (_word i = 0; i < sizeof(_word) * 8 && !stop; i++)
+        {
+            if((d->get_quantity_of_initialized_neurons_binary() & (1 << i)) == LOW)
+                d->get_cpu().write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+            else {
+                d->get_cpu().write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, HIGH);
+            }
+            usleep(250000);
+        }
+        d->get_cpu().write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+        sleep(1);
+        d->get_cpu().write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, HIGH);
+        sleep(1);
+        d->get_cpu().write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+        sleep(1);
+    }
+}
+
+void device::log_cycle()
+{
+    static int count = 0;
+
+    if(++count >= 0)
+    {
+        lgr.logging(logger::log_level_trace, "device::log_cycle()", brn_frnd->get_state());
+        count = 0;
+    }
+}
+
 void device::run()
 {
     brn_frnd->load();
@@ -89,12 +126,11 @@ void device::run()
 
     button_thread->detach();
 
+    auto g = new std::thread(led_work, this, &stop);
+    g->detach();
+
     while(!stop)
     {
-#if DEBUG
-        std::cout << brn_frnd->get_state() << std::endl;
-#endif
-
         hc_sr04_front->run();
         front_distanse = hc_sr04_front->get_distance();
 
@@ -107,10 +143,6 @@ void device::read_sensor_state()
 {
     static uword value_front = 0;
     static uword value_rear = 0;
-
-#if DEBUG
-    std::cout << "front = " << std::to_string(front_distanse) << "\trear = " << std::to_string(rear_distanse) << std::endl;
-#endif
 
     if(front_distanse != 0)
     {

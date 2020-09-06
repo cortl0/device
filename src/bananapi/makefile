@@ -33,3 +33,14 @@ $(TARGET): ../binary_neurons_network/src/brain/brain.cpp ../binary_neurons_netwo
 
 #uninstall:
 #	rm -rf $(PREFIX)/$(TARGET)
+
+copy:
+	sudo cp ./device.out /opt/bnn_device/device
+
+set_service:
+	sudo cp ./bnn_device.service /etc/systemd/system/bnn_device.service
+
+start_service:
+	sudo systemctl enable bnn_device.service
+	sudo systemctl daemon-reload
+	sudo systemctl restart bnn_device.service

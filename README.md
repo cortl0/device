@@ -4,7 +4,12 @@ The device consists of two components:
 arduino for controlling stepper motors,
 bananapi for brain and sensors
 
-## For project preparation
+## For project clone
+```
+git clone --recursive https://github.com/cortl0/device
+```
+
+## For project preparation if not recursive cloned
 ```
 make prepare
 ```
@@ -25,11 +30,25 @@ https://github.com/cortl0/binary_neurons_network
 Github repository
 https://github.com/cortl0/gpio
 
+#### ./src/logger/
+Github repository
+https://github.com/cortl0/logger
+
 #### ./src/unit_test/
 Unit test project
 
-#### ./device_schematic_diagram.drawio
+## ./device_schematic_diagram.drawio
 Schematic diagram of the device in drawio file format
+
+## Build
+using a makefile:  
+make  
+make all  
+make clean  
+if available:  
+make install  
+make uninstall  
+also if available QT build
 
 ## Author
 Ilya Shishkin  

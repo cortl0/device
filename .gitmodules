@@ -5,3 +5,7 @@
 [submodule "gpio"]
 	path = src/gpio
 	url = https://github.com/cortl0/gpio
+
+[submodule "logger"]
+	path = src/logger
+	url = https://github.com/cortl0/logger

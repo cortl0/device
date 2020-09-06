@@ -11,6 +11,7 @@
 
 #include "brain_friend.h"
 #include "../gpio/src/cpu.h"
+#include "../logger/src/logger.h"
 #include "sensors/hc_sr04.h"
 
 class device
@@ -18,7 +19,7 @@ class device
     short front_distanse = 0;
     short rear_distanse = 0;
 
-    volatile bool stop = false;
+    bool stop = false;
 
     cpu _cpu;
 
@@ -29,6 +30,8 @@ class device
     std::unique_ptr<brain_friend> brn_frnd;
     std::unique_ptr<std::thread> button_thread;
 
+    logger::logger lgr = logger::logger(logger::log_level_trace, "log.txt");
+
     static void brain_clock_cycle_handler(void* owner);
     static void button_thread_func(device* owner);
     void read_sensor_state();
@@ -36,6 +39,9 @@ class device
 
 public:
     device();
+    cpu& get_cpu();
+    uword get_quantity_of_initialized_neurons_binary();
+    void log_cycle();
     void run();
 };
 

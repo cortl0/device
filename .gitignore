@@ -1,5 +1,6 @@
-./src/binary_neurons_network
-./src/gpio
+./src/binary_neurons_network/*
+./src/gpio/*
+./src/logger/*
 *.out
 
 # C++ objects and libs

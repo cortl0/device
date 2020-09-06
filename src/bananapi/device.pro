@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     device.cpp \
     ../binary_neurons_network/src/brain/brain.cpp \
     ../binary_neurons_network/src/brain/random_put_get.cpp \
-    ../gpio/src/cpu.cpp
+    ../gpio/src/cpu.cpp \
+    ../logger/src/logger.cpp
 
 HEADERS += \
     brain_friend.h \
@@ -41,5 +42,6 @@ HEADERS += \
     ../binary_neurons_network/src/brain/random_put_get.h \
     ../binary_neurons_network/src/brain/simple_math.h \
     ../binary_neurons_network/src/brain/pch.h \
-    ../gpio/src/cpu.h
+    ../gpio/src/cpu.h \
+    ../logger/src/logger.h
 
