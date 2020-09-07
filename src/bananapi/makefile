@@ -7,7 +7,20 @@
 #
 
 NAME = device
+
 TARGET = $(NAME).out
+
+PREFIX = /opt/bnn_device
+
+SRCS = \
+main.cpp \
+../binary_neurons_network/src/brain/brain.cpp \
+../binary_neurons_network/src/brain/random_put_get.cpp \
+../gpio/src/cpu.cpp \
+../logger/src/logger.cpp \
+./brain_friend.cpp \
+./device.cpp \
+./sensors/hc_sr04.cpp
 
 #PREFIX = /usr/local/bin
 
@@ -19,14 +32,8 @@ all: $(TARGET)
 clean:
 	rm $(TARGET)
 
-$(TARGET): ../binary_neurons_network/src/brain/brain.cpp ../binary_neurons_network/src/brain/random_put_get.cpp ../gpio/src/cpu.cpp ./sensors/hc_sr04.cpp brain_friend.cpp device.cpp main.cpp
-	g++ -std=c++17 -c -o random_put_get.o ../binary_neurons_network/src/brain/random_put_get.cpp
-	g++ -std=c++17 -c -o binary_neurons_network.o ../binary_neurons_network/src/brain/brain.cpp
-	g++ -std=c++17 -c -o cpu.o ../gpio/src/cpu.cpp
-	g++ -std=c++17 -c -o brain_friend.o brain_friend.cpp
-	g++ -std=c++17 -c -o device.o device.cpp
-	g++ -std=c++17 -c -o hc_sr04.o ./sensors/hc_sr04.cpp
-	g++ -std=c++17 -pthread -o device.out main.cpp device.o brain_friend.o binary_neurons_network.o random_put_get.o cpu.o hc_sr04.o
+$(TARGET): $(SRCS)
+	g++ -std=c++17 -pthread -o $(TARGET) $(SRCS)
 
 #install:
 #	install $(TARGET) $(PREFIX)
@@ -34,13 +41,17 @@ $(TARGET): ../binary_neurons_network/src/brain/brain.cpp ../binary_neurons_netwo
 #uninstall:
 #	rm -rf $(PREFIX)/$(TARGET)
 
-copy:
-	sudo cp ./device.out /opt/bnn_device/device
-
-set_service:
+service_up: $(TARGET) ./bnn_device.service
+	sudo mkdir $(PREFIX)
+	sudo cp ./$(TARGET) $(PREFIX)/$(NAME)
 	sudo cp ./bnn_device.service /etc/systemd/system/bnn_device.service
-
-start_service:
 	sudo systemctl enable bnn_device.service
 	sudo systemctl daemon-reload
-	sudo systemctl restart bnn_device.service
+	sudo systemctl start bnn_device.service
+
+service_down:
+	sudo systemctl stop bnn_device.service
+	sudo systemctl disable bnn_device.service
+	sudo rm /etc/systemd/system/bnn_device.service
+	sudo rm -r $(PREFIX)
+	sudo systemctl daemon-reload

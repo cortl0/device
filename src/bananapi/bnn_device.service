@@ -1,10 +1,12 @@
 [Unit]
 Description=device with the binary neurons
-After=syslog.service
+#After=syslog.service
 
 [Service]
 Type=simple
 ExecStart=/opt/bnn_device/device
+#RemainAfterExit=yes
+#WorkingDirectory=/opt/bnn_device/device
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=multi-user.target
