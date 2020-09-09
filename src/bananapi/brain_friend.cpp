@@ -6,13 +6,16 @@
  *   licensed by GPL v3.0
  */
 
-//#define under_development
+#define under_development
 
 #include "brain_friend.h"
 
 #include <fstream>
 
-brain_friend::brain_friend(brain &brain_) : brain_(brain_) {}
+namespace bnn
+{
+
+brain_friend::brain_friend(bnn::brain &brain_, std::shared_ptr<logger::logger> lgr) : brain_(brain_), lgr(lgr) {}
 
 _word brain_friend::get_quantity_of_initialized_neurons_binary()
 {
@@ -43,7 +46,17 @@ std::string brain_friend::get_state()
 void brain_friend::load()
 {
 #ifdef under_development
-    std::ifstream in(fs::current_path() / "storage.bnn", std::ios::binary);
+    std::list<std::string> l;
+    for (auto & p : fs::directory_iterator(fs::current_path()))
+        if(p.path().filename().extension() == ".bnn")
+            l.push_back(p.path().filename());
+
+    if(!l.size())
+        return;
+
+    l.sort();
+
+    std::ifstream in(fs::current_path() / l.back(), std::ios::binary);
 
     if(in.is_open())
     {
@@ -92,6 +105,11 @@ void brain_friend::load()
 
         in >> brain_.rndm->debug_count_put;
         in >> brain_.rndm->debug_count_get;
+
+        lgr->logging(logger::log_level_trace, "brain_friend::load()",  "file " + std::string(fs::current_path() / l.back()) + " loaded");
+
+        if(l.size()>8)
+            fs::remove_all(fs::current_path() / l.front());
     }
 #endif
 }
@@ -110,7 +128,7 @@ void brain_friend::resize(_word brainBits_)
     {
         _word quantity_of_neuron_end_temp = 1 << (brainBits_);
 
-        std::vector<brain::union_storage> us_temp = std::vector<brain::union_storage>(quantity_of_neuron_end_temp);
+        std::vector<bnn::brain::union_storage> us_temp = std::vector<brain::union_storage>(quantity_of_neuron_end_temp);
 
         for(_word i = 0; i < brain_.quantity_of_neurons; i++)
             for(_word j = 0; j < sizeof(brain::union_storage) / sizeof(_word); j++)
@@ -133,7 +151,13 @@ void brain_friend::resize(_word brainBits_)
 void brain_friend::save()
 {
 #ifdef under_development
-    std::ofstream out(fs::current_path() / "storage.bnn", std::ios::binary);
+    static char time_buffer[15];
+    std::time_t time = std::time(nullptr);
+    std::strftime(time_buffer, 15, "%Y%m%d%H%M%S", std::localtime(&time));
+    std::string s(time_buffer);
+    s += ".bnn";
+
+    std::ofstream out(fs::current_path() / s, std::ios::binary);
 
     if(out.is_open())
     {
@@ -163,7 +187,7 @@ void brain_friend::save()
             out << brain_.rndm->get_array()[i];
 
         out << brain_.rndm->debug_count_put;
-        out << brain_.rndm->debug_count_get;
+        out << brain_.rndm->debug_count_get;lgr->logging(logger::log_level_trace, "brain_friend::save()",  "file " + std::string(fs::current_path() / s) + " saved");
     }
 #endif
 }
@@ -171,4 +195,6 @@ void brain_friend::save()
 void brain_friend::stop()
 {
     brain_.stop();
+}
+
 }

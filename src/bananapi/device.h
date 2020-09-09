@@ -21,26 +21,25 @@ class device
 
     bool stop = false;
 
-    cpu _cpu;
+    gpio::cpu _cpu;
 
     std::unique_ptr<hc_sr04> hc_sr04_front;
     std::unique_ptr<hc_sr04> hc_sr04_rear;
 
-    std::unique_ptr<brain> brn;
-    std::unique_ptr<brain_friend> brn_frnd;
+    std::unique_ptr<bnn::brain> brn;
+    std::unique_ptr<bnn::brain_friend> brn_frnd;
     std::unique_ptr<std::thread> button_thread;
 
-    logger::logger lgr = logger::logger(logger::log_level_trace, "log.txt");
+    std::shared_ptr<logger::logger> lgr = std::shared_ptr<logger::logger>(new logger::logger(logger::log_level_trace, "log.txt"));
 
     static void brain_clock_cycle_handler(void* owner);
-    static void button_thread_func(device* owner);
+    static void thread_button(device*);
+    static void thread_led(device*);
     void read_sensor_state();
     void write_motor_state();
 
 public:
     device();
-    cpu& get_cpu();
-    uword get_quantity_of_initialized_neurons_binary();
     void log_cycle();
     void run();
 };

@@ -9,18 +9,24 @@
 #ifndef BRAIN_FRIEND_H
 #define BRAIN_FRIEND_H
 
+#include <list>
 #include <experimental/filesystem>
 
 #include "../binary_neurons_network/src/brain/brain.h"
+#include "../logger/src/logger.h"
 
 namespace fs = std::experimental::filesystem;
 
+namespace bnn
+{
+
 struct brain_friend
 {
-    brain &brain_;
+    bnn::brain &brain_;
+    std::shared_ptr<logger::logger> lgr;
 
     brain_friend() = delete;
-    brain_friend(brain &brain_);
+    brain_friend(bnn::brain &brain_, std::shared_ptr<logger::logger>);
     _word get_quantity_of_initialized_neurons_binary();
     std::string get_state();
     void load();
@@ -28,5 +34,7 @@ struct brain_friend
     void save();
     void stop();
 };
+
+}
 
 #endif // BRAIN_FRIEND_H

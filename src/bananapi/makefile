@@ -33,7 +33,7 @@ clean:
 	rm $(TARGET)
 
 $(TARGET): $(SRCS)
-	g++ -std=c++17 -pthread -o $(TARGET) $(SRCS)
+	g++ -o $(TARGET) $(SRCS) -std=c++17 -pthread -lstdc++fs
 
 #install:
 #	install $(TARGET) $(PREFIX)
@@ -49,7 +49,7 @@ service_up: $(TARGET) ./bnn_device.service
 	sudo systemctl daemon-reload
 	sudo systemctl start bnn_device.service
 
-service_down:
+service_down: /etc/systemd/system/bnn_device.service
 	sudo systemctl stop bnn_device.service
 	sudo systemctl disable bnn_device.service
 	sudo rm /etc/systemd/system/bnn_device.service

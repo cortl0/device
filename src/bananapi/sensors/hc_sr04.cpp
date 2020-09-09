@@ -16,7 +16,7 @@ hc_sr04::hc_sr04(uword pin_echo_cfg_reg,
                  uword pin_trigger_cfg_bit,
                  uword pin_trigger_dat_reg,
                  uword pin_trigger_dat_bit,
-                 cpu& _cpu)
+                 gpio::cpu& _cpu)
     : pin_echo_cfg_reg(pin_echo_cfg_reg),
       pin_echo_cfg_bit(pin_echo_cfg_bit),
       pin_echo_dat_reg(pin_echo_dat_reg),

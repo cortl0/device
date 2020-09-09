@@ -33,7 +33,7 @@ class hc_sr04
     // distance in centimeters
     short distance;
 
-    cpu& _cpu;
+    gpio::cpu& _cpu;
 
 public:
     enum
@@ -49,7 +49,7 @@ public:
             uword pin_echo_dat_reg, uword pin_echo_dat_bit,
             uword pin_trigger_cfg_reg, uword pin_trigger_cfg_bit,
             uword pin_trigger_dat_reg, uword pin_trigger_dat_bit,
-            cpu& _cpu);
+            gpio::cpu& _cpu);
     
     // get the distance in centimeters
     short get_distance();
