@@ -9,7 +9,7 @@ bananapi for brain and sensors
 git clone --recursive https://github.com/cortl0/device
 ```
 
-## For project preparation if not recursive cloned
+## If not recursive cloned then project preparation
 ```
 make prepare
 ```

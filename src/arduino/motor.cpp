@@ -47,29 +47,62 @@ void motor::refresh_velosity(int acceleration, int factor)
 
 void motor::refrash_state(unsigned long time_micros, int controlValue)
 {
+  delta = time_micros - time_micros_old;
+
+  if(time_micros_old > time_micros)
+  {
+    delta = int_max - time_micros_old;
+    delta += time_micros;
+  }
+
+  time_micros_old = time_micros;
+
+  time += delta;
+
   if (controlValue == 0)
   {
     temp = (coeff / acceleration_run_out);
-    if (time_micros > next_step_time_acceleration + temp) {
+    if (time > next_step_time_acceleration + temp)
+    {
       next_step_time_acceleration += temp;
       refresh_velosity(1, -simple_math::sign0(velosity));
     }
   }
-  else {
+  else
+  {
     temp = (coeff / acceleration);
-    if (time_micros > next_step_time_acceleration + temp) {
+    if (time > next_step_time_acceleration + temp)
+    {
       next_step_time_acceleration += temp;
       refresh_velosity(1, (controlValue & 1) - (controlValue >> 1));
     }
   }
+  
   if (velosity == 0)
-    next_step_time_velosity = time_micros;
-  else {
+    next_step_time_velosity = time;
+  else
+  {
     temp = (coeff / simple_math::Abs(velosity)) / (1 << ms_current);
-    if (time_micros > next_step_time_velosity + temp) {
+    if (time > next_step_time_velosity + temp)
+    {
       next_step_time_velosity += temp;
       step_ = !step_;
     }
   }
+
+  temp = int_max;
+  
+  if(temp > next_step_time_acceleration)
+    temp = next_step_time_acceleration;
+  if(temp > next_step_time_velosity)
+    temp = next_step_time_velosity;      
+  if(temp > time)
+    temp = time;
+    
+  next_step_time_acceleration -= temp;
+  next_step_time_velosity -= temp;
+  time -= temp;
 }
+
+
 

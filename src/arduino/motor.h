@@ -9,6 +9,8 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
+#define int_max 4294967295
+
 #include "simple_math.h"
 
 class motor
@@ -39,6 +41,9 @@ class motor
   int direction_ = 0;
   int step_ = 0;
   unsigned long temp; // temp variable for refrash_state()
+  unsigned long time_micros_old = 0;
+  unsigned long delta;
+  unsigned long time = 0;
 
 public:
   motor(int velosity_max, int acceleration, int acceleration_run_out);

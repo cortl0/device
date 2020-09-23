@@ -29,9 +29,9 @@ struct brain_friend
     brain_friend(bnn::brain &brain_, std::shared_ptr<logger::logger>);
     _word get_quantity_of_initialized_neurons_binary();
     std::string get_state();
-    void load();
+    void load(std::shared_ptr<logger::logger>);
     void resize(_word brainBits);
-    void save();
+    void save(std::shared_ptr<logger::logger>);
     void stop();
 };
 

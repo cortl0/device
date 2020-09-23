@@ -1,3 +1,11 @@
+#
+#   gpio
+#   created by Ilya Shishkin
+#   cortl@8iter.ru
+#   https://github.com/cortl0/device
+#   licensed by GPL v3.0
+#
+
 [Unit]
 Description=device with the binary neurons
 #After=syslog.service
@@ -5,8 +13,8 @@ Description=device with the binary neurons
 [Service]
 Type=simple
 ExecStart=/opt/bnn_device/device
+WorkingDirectory=/opt/bnn_device
 #RemainAfterExit=yes
-#WorkingDirectory=/opt/bnn_device/device
 
 [Install]
 WantedBy=multi-user.target
