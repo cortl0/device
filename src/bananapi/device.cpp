@@ -18,8 +18,8 @@ device::device()
                                    CON2_P33_CFG_REG, CON2_P33_CFG_BIT, CON2_P33_DAT_REG, CON2_P33_DAT_BIT, _cpu));
 #endif
 
-    _word random_array_length_in_power_of_two = 21;
-    _word quantity_of_neurons_in_power_of_two = 13;
+    _word random_array_length_in_power_of_two = 24;
+    _word quantity_of_neurons_in_power_of_two = 16;
     _word input_length = 1024;
     _word output_length = 4;
 

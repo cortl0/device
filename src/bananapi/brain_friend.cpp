@@ -210,8 +210,8 @@ void brain_friend::save(std::shared_ptr<logger::logger> lgr)
 
         for(_word i = 0; i < brain_.rndm->get_length(); i++)
         {
-            b = brain_.rndm->get_array()[i];
-            out.write(reinterpret_cast<char*>(&b), 1);
+            w = brain_.rndm->get_array()[i];
+            out.write(reinterpret_cast<char*>(&w), sizeof (w));
         }
 
         out.write(reinterpret_cast<char*>(&brain_.rndm->debug_count_put), sizeof (brain_.rndm->debug_count_put));
