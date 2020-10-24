@@ -17,6 +17,7 @@
 #define HC_SR04_SPEED_OF_SOUND_IN_AIR 343 // [m/s] at 20'C
 #define HC_SR04_CORRECTION_FACTOR 25 // %
 #define HC_SR04_COEFFICIENT (HC_SR04_SPEED_OF_SOUND_IN_AIR * 2 / 10 * 100 / (100 + HC_SR04_CORRECTION_FACTOR)) // [m/s]
+#define HC_SR04_MAX_DISTANCE 127 // [cm]
 
 class hc_sr04
 {

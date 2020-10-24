@@ -9,10 +9,11 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-//#define hc_sr04_rear_on
-
+#include <stdexcept>
 #include <stdlib.h>
+#include <algorithm>
 #include <experimental/filesystem>
+#include <vector>
 
 #include "brain_friend.h"
 #include "../gpio/src/cpu.h"
@@ -23,21 +24,13 @@ namespace fs = std::experimental::filesystem;
 
 class device
 {
-    short front_distanse = 0;
-
-#ifdef hc_sr04_rear_on
-    short rear_distanse = 0;
-#endif
-
     volatile bool stop = false;
 
     gpio::cpu _cpu;
 
-    std::unique_ptr<hc_sr04> hc_sr04_front;
+    std::vector<std::shared_ptr<hc_sr04>> sensors;
 
-#ifdef hc_sr04_rear_on
-    std::unique_ptr<hc_sr04> hc_sr04_rear;
-#endif
+    std::vector<short> distanses;
 
     std::unique_ptr<bnn::brain> brn;
     std::unique_ptr<bnn::brain_friend> brn_frnd;

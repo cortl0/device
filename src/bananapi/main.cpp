@@ -6,11 +6,23 @@
  *   licensed by GPL v3.0
  */
 
+#include <iostream>
 #include "device.h"
 
 int main()
 {
-    device().run();
+    try
+    {
+        device().run();
+    }
+    catch(std::runtime_error e)
+    {
+        std::cout << "error: " << e.what() << std::endl;
+    }
+    catch(...)
+    {
+        std::cout << "unknown error" << std::endl;
+    }
 
     return 0;
 }

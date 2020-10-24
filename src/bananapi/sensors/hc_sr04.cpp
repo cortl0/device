@@ -78,8 +78,8 @@ void hc_sr04::run()
 
         distance = static_cast<short>(duration.count() / HC_SR04_COEFFICIENT);
 
-        if(distance > 400)
-            distance = 0;
+        if(distance > HC_SR04_MAX_DISTANCE)
+            distance = HC_SR04_MAX_DISTANCE;
 
         state = hc_sr04_state_allow_new_data;
 

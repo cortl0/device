@@ -10,13 +10,25 @@
 
 device::device()
 {
-    hc_sr04_front.reset(new hc_sr04(CON2_P31_CFG_REG, CON2_P31_CFG_BIT, CON2_P31_DAT_REG, CON2_P31_DAT_BIT,
-                                    CON2_P29_CFG_REG, CON2_P29_CFG_BIT, CON2_P29_DAT_REG, CON2_P29_DAT_BIT, _cpu));
+    /*
+    hc_sr04_front.push_back(
+                std::shared_ptr<hc_sr04>(
+                    new hc_sr04(
+                        CON2_P31_CFG_REG, CON2_P31_CFG_BIT, CON2_P31_DAT_REG, CON2_P31_DAT_BIT,
+                        CON2_P29_CFG_REG, CON2_P29_CFG_BIT, CON2_P29_DAT_REG, CON2_P29_DAT_BIT, _cpu)));
+*/
 
-#ifdef hc_sr04_rear_on
-    hc_sr04_rear.reset(new hc_sr04(CON2_P35_CFG_REG, CON2_P35_CFG_BIT, CON2_P35_DAT_REG, CON2_P35_DAT_BIT,
-                                   CON2_P33_CFG_REG, CON2_P33_CFG_BIT, CON2_P33_DAT_REG, CON2_P33_DAT_BIT, _cpu));
-#endif
+    sensors.push_back(
+                std::shared_ptr<hc_sr04>(
+                    new hc_sr04(
+                        CON2_P35_CFG_REG, CON2_P35_CFG_BIT, CON2_P35_DAT_REG, CON2_P35_DAT_BIT,
+                        CON2_P33_CFG_REG, CON2_P33_CFG_BIT, CON2_P33_DAT_REG, CON2_P33_DAT_BIT, _cpu)));
+
+    sensors.push_back(
+                std::shared_ptr<hc_sr04>(
+                    new hc_sr04(
+                        CON2_P37_CFG_REG, CON2_P37_CFG_BIT, CON2_P37_DAT_REG, CON2_P37_DAT_BIT,
+                        CON2_P27_CFG_REG, CON2_P27_CFG_BIT, CON2_P27_DAT_REG, CON2_P27_DAT_BIT, _cpu)));
 
     _word random_array_length_in_power_of_two = 24;
     _word quantity_of_neurons_in_power_of_two = 16;
@@ -24,10 +36,10 @@ device::device()
     _word output_length = 4;
 
     brn.reset(new bnn::brain(random_array_length_in_power_of_two,
-                        quantity_of_neurons_in_power_of_two,
-                        input_length,
-                        output_length,
-                        brain_clock_cycle_handler));
+                             quantity_of_neurons_in_power_of_two,
+                             input_length,
+                             output_length,
+                             brain_clock_cycle_handler));
 
     brn_frnd.reset(new bnn::brain_friend(*brn.get(), lgr));
 
@@ -45,6 +57,12 @@ device::device()
     // led count binary neurons init
     _cpu.write_bits(CON2_P07_CFG_REG, CON2_P07_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
     _cpu.write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+
+    // led power
+    _cpu.write_bits(CON2_P05_CFG_REG, CON2_P05_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+
+    _cpu.write_bits(CON2_P03_CFG_REG, CON2_P03_CFG_BIT, P_SELECT_INPUT, P_SELECT_LENGTH);
+    _cpu.write_bits(CON2_P03_PUL_REG, CON2_P03_PUL_BIT, P_PULL_DOWN, P_PULL_LENGTH);
 }
 
 void device::brain_clock_cycle_handler(void* owner)
@@ -105,6 +123,10 @@ void device::thread_led(device* d)
         }
 
         sleep(1);
+
+        //        // led power
+        //        d->_cpu.write_bit(CON2_P05_DAT_REG, CON2_P05_DAT_BIT,
+        //                          d->_cpu.read_bit(CON2_P03_DAT_REG, CON2_P03_DAT_BIT));
     }
 }
 
@@ -114,13 +136,22 @@ void device::log_cycle()
 
     if(++count >= 128)
     {
-        lgr->logging(logger::log_level_trace, "device::log_cycle()", brn_frnd->get_state());
+        std::string s;
+
+        std::for_each(distanses.begin(), distanses.end(), [&](short d)
+        {
+            s += std::to_string(d) + "\t";
+        });
+
+        lgr->logging(logger::log_level_trace, "device::log_cycle()", brn_frnd->get_state() + "\t" + s);
         count = 0;
     }
 }
 
 void device::run()
 {
+    _cpu.write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
+
     brn_frnd->load(lgr);
 
     brn->start(this);
@@ -134,15 +165,26 @@ void device::run()
 
     lgr->logging(logger::log_level_information, "device::run()", "device started");
 
+    std::for_each(sensors.begin(), sensors.end(), [&](std::shared_ptr<hc_sr04>)
+    {
+        distanses.push_back(0);
+    });
+
+    auto it = distanses.begin();
+
+    short temp;
+
     while(!stop)
     {
-        hc_sr04_front->run();
-        front_distanse = hc_sr04_front->get_distance();
+        it = distanses.begin();
 
-#ifdef hc_sr04_rear_on
-        hc_sr04_rear->run();
-        rear_distanse = hc_sr04_rear->get_distance();
-#endif
+        std::for_each(sensors.begin(), sensors.end(), [&](std::shared_ptr<hc_sr04> sensor)
+        {
+            sensor->run();
+            temp = sensor->get_distance();
+            if(temp)
+                *(it++) = temp;
+        });
     }
 
     lgr->logging(logger::log_level_information, "device::run()", "device stopped");
@@ -150,41 +192,22 @@ void device::run()
 
 void device::read_sensor_state()
 {
-    static uword value_front = 0;
+    _word length = 8;
 
-#ifdef hc_sr04_rear_on
-    static uword value_rear = 0;
-#endif
+    _word i = 0;
 
-    if(front_distanse != 0)
-    {
-        value_front &= static_cast<uword>(front_distanse);
-        value_front |= static_cast<uword>(front_distanse);
-    }
+    _word c = 1024 / (length * static_cast<_word>(distanses.size()));
 
-#ifdef hc_sr04_rear_on
-    if(rear_distanse != 0)
-    {
-        value_rear &= static_cast<uword>(rear_distanse);
-        value_rear |= static_cast<uword>(rear_distanse);
-    }
-#endif
+    c -= 1;
 
-    static uword value;
+    c *= length * static_cast<_word>(distanses.size());
 
-#ifdef hc_sr04_rear_on
-    value = value_front + (value_rear << 16);
-
-    for(unsigned int i = 0; i < 32; i++)
-        for(unsigned int j = 0; j < 32; j++)
-            brn->set_in(i * 32 + j, (value >> j) & 1);
-#else
-    value = value_front;
-
-    for(unsigned int i = 0; i < 64; i++)
-        for(unsigned int j = 0; j < 16; j++)
-            brn->set_in(i * 16 + j, (value >> j) & 1);
-#endif
+    while(i < c)
+        std::for_each(distanses.begin(), distanses.end(), [&](short d)
+        {
+            for(unsigned int j = 0; j < length; j++)
+                brn->set_in(i++, (d >> j) & 1);
+        });
 }
 
 void device::write_motor_state()
