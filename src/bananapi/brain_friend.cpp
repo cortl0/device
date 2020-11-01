@@ -23,18 +23,18 @@ _word brain_friend::get_quantity_of_initialized_neurons_binary()
 std::string brain_friend::get_state()
 {
     std::string s("in = ");
-    for (_word i = 0; i < 32/*brain_.get_input_length()*/; i++)
+    for (_word i = 0; i < 24/*brain_.get_input_length()*/; i++)
         s += std::to_string(brain_.world_input[i]);
 
     s += " out = ";
     for (_word i = 0; i < brain_.get_output_length(); i++)
         s += std::to_string(brain_.world_output[i]);
 
-    s += " quantity_of_initialized_neurons_binary = ";
+    s += " init = ";
 
     s += std::to_string(brain_.quantity_of_initialized_neurons_binary);
 
-    s += " iteration = ";
+    s += " iter = ";
 
     s += std::to_string(brain_.iteration);
 
@@ -104,7 +104,7 @@ void brain_friend::load(std::shared_ptr<logger::logger> lgr)
         in.read(reinterpret_cast<char*>(&rndmLength), sizeof (rndmLength));
 
         if(rndmLength != brain_.rndm->get_length())
-            brain_.rndm.reset(new random_put_get(rndmLength));
+            brain_.rndm.reset(new random_put_get(rndmLength, 3));
 
         for(_word i = 0; i < brain_.rndm->get_length(); i++)
         {
@@ -228,4 +228,4 @@ void brain_friend::stop()
     brain_.stop();
 }
 
-}
+} // !namespace bnn

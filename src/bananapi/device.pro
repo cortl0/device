@@ -25,6 +25,7 @@ SOURCES += main.cpp \
     sensors/hc_sr04.cpp \
     device.cpp \
     ../binary_neurons_network/src/brain/brain.cpp \
+    ../binary_neurons_network/src/brain/m_sequence.cpp \
     ../binary_neurons_network/src/brain/random_put_get.cpp \
     ../gpio/src/cpu.cpp \
     ../logger/src/logger.cpp
@@ -39,9 +40,10 @@ HEADERS += \
     sensors/hc_sr04.h \
     device.h \
     ../binary_neurons_network/src/brain/brain.h \
+    ../binary_neurons_network/src/brain/m_sequence.h \
     ../binary_neurons_network/src/brain/random_put_get.h \
     ../binary_neurons_network/src/brain/simple_math.h \
-    ../binary_neurons_network/src/brain/pch.h \
+    ../binary_neurons_network/src/brain/config.h \
     ../gpio/src/cpu.h \
     ../logger/src/logger.h
 

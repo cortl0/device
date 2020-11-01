@@ -10,13 +10,11 @@
 
 device::device()
 {
-    /*
-    hc_sr04_front.push_back(
+    sensors.push_back(
                 std::shared_ptr<hc_sr04>(
                     new hc_sr04(
                         CON2_P31_CFG_REG, CON2_P31_CFG_BIT, CON2_P31_DAT_REG, CON2_P31_DAT_BIT,
                         CON2_P29_CFG_REG, CON2_P29_CFG_BIT, CON2_P29_DAT_REG, CON2_P29_DAT_BIT, _cpu)));
-*/
 
     sensors.push_back(
                 std::shared_ptr<hc_sr04>(
@@ -31,11 +29,13 @@ device::device()
                         CON2_P27_CFG_REG, CON2_P27_CFG_BIT, CON2_P27_DAT_REG, CON2_P27_DAT_BIT, _cpu)));
 
     _word random_array_length_in_power_of_two = 24;
+    _word random_max_value_in_power_of_two = 31;
     _word quantity_of_neurons_in_power_of_two = 16;
     _word input_length = 1024;
     _word output_length = 4;
 
     brn.reset(new bnn::brain(random_array_length_in_power_of_two,
+                             random_max_value_in_power_of_two,
                              quantity_of_neurons_in_power_of_two,
                              input_length,
                              output_length,
@@ -58,11 +58,13 @@ device::device()
     _cpu.write_bits(CON2_P07_CFG_REG, CON2_P07_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
     _cpu.write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
 
+    /*
     // led power
     _cpu.write_bits(CON2_P05_CFG_REG, CON2_P05_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
 
     _cpu.write_bits(CON2_P03_CFG_REG, CON2_P03_CFG_BIT, P_SELECT_INPUT, P_SELECT_LENGTH);
     _cpu.write_bits(CON2_P03_PUL_REG, CON2_P03_PUL_BIT, P_PULL_DOWN, P_PULL_LENGTH);
+    */
 }
 
 void device::brain_clock_cycle_handler(void* owner)
@@ -124,9 +126,11 @@ void device::thread_led(device* d)
 
         sleep(1);
 
-        //        // led power
-        //        d->_cpu.write_bit(CON2_P05_DAT_REG, CON2_P05_DAT_BIT,
-        //                          d->_cpu.read_bit(CON2_P03_DAT_REG, CON2_P03_DAT_BIT));
+        /*
+        // led power
+        d->_cpu.write_bit(CON2_P05_DAT_REG, CON2_P05_DAT_BIT,
+                          d->_cpu.read_bit(CON2_P03_DAT_REG, CON2_P03_DAT_BIT));
+        */
     }
 }
 
@@ -196,9 +200,7 @@ void device::read_sensor_state()
 
     _word i = 0;
 
-    _word c = 1024 / (length * static_cast<_word>(distanses.size()));
-
-    c -= 1;
+    _word c = 1024 / (length * static_cast<_word>(distanses.size())) - 1;
 
     c *= length * static_cast<_word>(distanses.size());
 

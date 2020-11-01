@@ -28,8 +28,8 @@ class chassis
 {
   unsigned long time_current = micros();
   control *cntrl;
-  motor motor_left = motor(16, 16, 16);
-  motor motor_right = motor(16, 16, 16);
+  motor motor_left = motor(32, 8, 4);
+  motor motor_right = motor(32, 8, 4);
 
 public:
   chassis();
