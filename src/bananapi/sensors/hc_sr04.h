@@ -9,10 +9,11 @@
 #ifndef HC_SR04_H
 #define HC_SR04_H
 
-#include "../../gpio/src/cpu.h"
+#include <chrono>
 
 #include <unistd.h>
-#include <chrono>
+
+#include "../../gpio/src/board/bpi_p2_zero/bpi_p2_zero.h"
 
 #define HC_SR04_SPEED_OF_SOUND_IN_AIR 343 // [m/s] at 20'C
 #define HC_SR04_CORRECTION_FACTOR 25 // %

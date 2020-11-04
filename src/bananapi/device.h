@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "brain_friend.h"
-#include "../gpio/src/cpu.h"
+#include "../gpio/src/board/bpi_p2_zero/bpi_p2_zero.h"
 #include "../logger/src/logger.h"
 #include "sensors/hc_sr04.h"
 
@@ -26,7 +26,7 @@ class device
 {
     volatile bool stop = false;
 
-    gpio::cpu _cpu;
+    gpio::cpu _cpu = gpio::cpu(BASE_ADDRESS_GPIO);
 
     std::vector<std::shared_ptr<hc_sr04>> sensors;
 
