@@ -6,13 +6,13 @@
  *   licensed by GPL v3.0
  */
 
-#ifndef BRAIN_FRIEND_H
-#define BRAIN_FRIEND_H
+#ifndef BRAIN_FRIEND_DEV_H
+#define BRAIN_FRIEND_DEV_H
 
 #include <list>
 #include <experimental/filesystem>
 
-#include "../binary_neurons_network/src/brain/brain.h"
+#include "../binary_neurons_network/src/brain_friend.h"
 #include "../logger/src/logger.h"
 
 namespace fs = std::experimental::filesystem;
@@ -20,21 +20,18 @@ namespace fs = std::experimental::filesystem;
 namespace bnn
 {
 
-struct brain_friend
+struct brain_friend_dev : brain_friend
 {
-    bnn::brain &brain_;
     std::shared_ptr<logger::logger> lgr;
 
-    brain_friend() = delete;
-    brain_friend(bnn::brain &brain_, std::shared_ptr<logger::logger>);
+    brain_friend_dev() = delete;
+    brain_friend_dev(bnn::brain &brain_, std::shared_ptr<logger::logger>);
     _word get_quantity_of_initialized_neurons_binary();
     std::string get_state();
     void load(std::shared_ptr<logger::logger>);
-    void resize(_word brainBits);
     void save(std::shared_ptr<logger::logger>);
-    void stop();
 };
 
-}
+} // namespace bnn
 
-#endif // BRAIN_FRIEND_H
+#endif // BRAIN_FRIEND_DEV_H

@@ -41,7 +41,7 @@ device::device()
                              output_length,
                              brain_clock_cycle_handler));
 
-    brn_frnd.reset(new bnn::brain_friend(*brn.get(), lgr));
+    brn_frnd.reset(new bnn::brain_friend_dev(*brn.get(), lgr));
 
     // brain output to arduino input for motors
     _cpu.write_bits(PA_CFG0, PA00_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
