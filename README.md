@@ -41,14 +41,11 @@ Unit test project
 Schematic diagram of the device in drawio file format
 
 ## Build
-using a makefile:  
 make  
-make all  
 make clean  
-if available:  
-make install  
-make uninstall  
-also if available QT build
+make service_up  
+make service_down  
+QT build
 
 ## Author
 Ilya Shishkin  
@@ -63,4 +60,4 @@ https://github.com/cortl0/device
 ## License
 This project is licensed under the GPL v3.0 - see the LICENSE file for details
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DPXPWAL9BQD8Q)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=cortl@yandex.ru&item_name=for+the+development+binary+neurons+network+and+device&amount=5%2e00&currency_code=USD)

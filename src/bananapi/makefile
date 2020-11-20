@@ -28,10 +28,7 @@ main.cpp \
 ./device.cpp \
 ./sensors/hc_sr04.cpp
 
-#PREFIX = /usr/local/bin
-
-.PHONY: all clean
-#install uninstall
+.PHONY: all clean service_up service_down
 
 all: $(TARGET)
 
@@ -40,12 +37,6 @@ clean:
 
 $(TARGET): $(SRCS)
 	g++ -o $(TARGET) $(SRCS) -std=c++17 -pthread -lstdc++fs
-
-#install:
-#	install $(TARGET) $(PREFIX)
-
-#uninstall:
-#	rm -rf $(PREFIX)/$(TARGET)
 
 service_up: $(TARGET) ./bnn_device.service
 	sudo mkdir $(PREFIX)
