@@ -59,5 +59,3 @@ https://github.com/cortl0/device
 
 ## License
 This project is licensed under the GPL v3.0 - see the LICENSE file for details
-
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=cortl@yandex.ru&item_name=for+the+development+binary+neurons+network+and+device&amount=5%2e00&currency_code=USD)

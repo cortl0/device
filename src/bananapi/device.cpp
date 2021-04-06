@@ -10,6 +10,8 @@
 
 device::device()
 {
+    _cpu.reset(new gpio::cpu(BASE_ADDRESS_GPIO));
+
     sensors.push_back(
                 std::shared_ptr<hc_sr04>(
                     new hc_sr04(
@@ -28,11 +30,14 @@ device::device()
                         CON2_P37_CFG_REG, CON2_P37_CFG_BIT, CON2_P37_DAT_REG, CON2_P37_DAT_BIT,
                         CON2_P27_CFG_REG, CON2_P27_CFG_BIT, CON2_P27_DAT_REG, CON2_P27_DAT_BIT, _cpu)));
 
+    std::for_each(sensors.begin(), sensors.end(), [&](std::shared_ptr<hc_sr04>)
+    {
+        distanses.push_back(0);
+    });
+
     _word random_array_length_in_power_of_two = 24;
     _word random_max_value_in_power_of_two = 31;
     _word quantity_of_neurons_in_power_of_two = 16;
-    _word input_length = 1024;
-    _word output_length = 4;
 
     brn.reset(new bnn::brain(random_array_length_in_power_of_two,
                              random_max_value_in_power_of_two,
@@ -44,19 +49,19 @@ device::device()
     brn_frnd.reset(new bnn::brain_friend_dev(*brn.get(), lgr));
 
     // brain output to arduino input for motors
-    _cpu.write_bits(PA_CFG0, PA00_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
-    _cpu.write_bits(PA_CFG0, PA01_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
-    _cpu.write_bits(PA_CFG0, PA02_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
-    _cpu.write_bits(PA_CFG0, PA03_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
-    _cpu.write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
+    _cpu->write_bits(PA_CFG0, PA00_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+    _cpu->write_bits(PA_CFG0, PA01_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+    _cpu->write_bits(PA_CFG0, PA02_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+    _cpu->write_bits(PA_CFG0, PA03_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+    _cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
 
     // stop and save button
-    _cpu.write_bits(CON2_P10_CFG_REG, CON2_P10_CFG_BIT, P_SELECT_INPUT, P_SELECT_LENGTH);
-    _cpu.write_bits(CON2_P10_PUL_REG, CON2_P10_PUL_BIT, P_PULL_DOWN, P_PULL_LENGTH);
+    _cpu->write_bits(CON2_P10_CFG_REG, CON2_P10_CFG_BIT, P_SELECT_INPUT, P_SELECT_LENGTH);
+    _cpu->write_bits(CON2_P10_PUL_REG, CON2_P10_PUL_BIT, P_PULL_DOWN, P_PULL_LENGTH);
 
     // led count binary neurons init
-    _cpu.write_bits(CON2_P07_CFG_REG, CON2_P07_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
-    _cpu.write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+    _cpu->write_bits(CON2_P07_CFG_REG, CON2_P07_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
+    _cpu->write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
 
     /*
     // led power
@@ -70,25 +75,21 @@ device::device()
 void device::brain_clock_cycle_handler(void* owner)
 {
     static_cast<device*>(owner)->log_cycle();
-
-    static_cast<device*>(owner)->write_motor_state();
-
-    static_cast<device*>(owner)->read_sensor_state();
 }
 
 void device::thread_button(device* d)
 {
     while(d)
     {
-        if(d->_cpu.read_bit(CON2_P10_DAT_REG, CON2_P10_DAT_BIT))
+        if(d->_cpu->read_bit(CON2_P10_DAT_REG, CON2_P10_DAT_BIT))
         {
-            d->lgr->logging(logger::log_level_information, "device::thread_button()", "button down");
+            d->lgr->logging(logger::log_level_information, sndr, "button down");
 
             d->brn_frnd->stop();
-            d->_cpu.write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, d->brn->get_output_length());
+            d->_cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, d->brn->get_output_length());
             d->brn_frnd->save(d->lgr);
 
-            while(d->_cpu.read_bit(CON2_P10_DAT_REG, CON2_P10_DAT_BIT));
+            while(d->_cpu->read_bit(CON2_P10_DAT_REG, CON2_P10_DAT_BIT));
 
             sleep(1);
 
@@ -117,10 +118,10 @@ void device::thread_led(device* d)
 
         for (_word i = 0; i < pow_two && !d->stop; i++)
         {
-            d->_cpu.write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, HIGH);
+            d->_cpu->write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, HIGH);
             usleep(250000);
 
-            d->_cpu.write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
+            d->_cpu->write_bit(CON2_P07_DAT_REG, CON2_P07_DAT_BIT, LOW);
             usleep(250000);
         }
 
@@ -147,32 +148,46 @@ void device::log_cycle()
             s += std::to_string(d) + "\t";
         });
 
-        lgr->logging(logger::log_level_trace, "device::log_cycle()", brn_frnd->get_state() + "\t" + s);
+        lgr->logging(logger::log_level_trace, sndr, brn_frnd->get_state() + "\t" + s);
         count = 0;
     }
 }
 
 void device::run()
 {
-    _cpu.write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
+    _cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
 
     brn_frnd->load(lgr);
 
     brn->start(this);
 
-    button_thread.reset(new std::thread(thread_button, this));
+    lgr->logging(logger::log_level_information, sndr, "device started");
 
-    button_thread->detach();
+    std::thread b(thread_button, this);
+    b.detach();
 
-    auto g = new std::thread(thread_led, this);
-    g->detach();
+    std::thread l(thread_led, this);
+    l.detach();
 
-    lgr->logging(logger::log_level_information, "device::run()", "device started");
+    std::thread m(write_motor_state, this);
+    m.detach();
 
-    std::for_each(sensors.begin(), sensors.end(), [&](std::shared_ptr<hc_sr04>)
-    {
-        distanses.push_back(0);
-    });
+    read_sensor_state();
+
+    sleep(1);
+
+    lgr->logging(logger::log_level_information, sndr, "device stopped");
+}
+
+void device::read_sensor_state()
+{
+    _word byte_length = 8;
+
+    _word i;
+
+    _word c = input_length / (byte_length * static_cast<_word>(distanses.size()));
+
+    c *= byte_length * static_cast<_word>(distanses.size());
 
     auto it = distanses.begin();
 
@@ -180,45 +195,40 @@ void device::run()
 
     while(!stop)
     {
+        i = 0;
+
         it = distanses.begin();
 
         std::for_each(sensors.begin(), sensors.end(), [&](std::shared_ptr<hc_sr04> sensor)
         {
-            sensor->run();
             temp = sensor->get_distance();
             if(temp)
-                *(it++) = temp;
+                *(it) = temp;
+            it++;
         });
+
+        while(i + distanses.size() <= c)
+            std::for_each(distanses.begin(), distanses.end(), [&](short d)
+            {
+                for(_word j = 0; j < byte_length; j++)
+                    brn->set_in(i++, (d >> j) & 1);
+            });
     }
-
-    lgr->logging(logger::log_level_information, "device::run()", "device stopped");
 }
 
-void device::read_sensor_state()
+void device::write_motor_state(device* d)
 {
-    _word length = 8;
+    uword value;
 
-    _word i = 0;
+    while(!d->stop)
+    {
+        value = 0;
 
-    _word c = 1024 / (length * static_cast<_word>(distanses.size())) - 1;
+        for(unsigned int i = 0; i < d->brn->get_output_length(); i++)
+            value |= static_cast<uword>(d->brn->get_out(i)) << i;
 
-    c *= length * static_cast<_word>(distanses.size());
+        d->_cpu->write_bits(PA_DAT, PA00_DAT_BIT, value, d->brn->get_output_length());
 
-    while(i < c)
-        std::for_each(distanses.begin(), distanses.end(), [&](short d)
-        {
-            for(unsigned int j = 0; j < length; j++)
-                brn->set_in(i++, (d >> j) & 1);
-        });
-}
-
-void device::write_motor_state()
-{
-    static uword value;
-    value = 0;
-
-    for(unsigned int i = 0; i < brn->get_output_length(); i++)
-        value |= static_cast<uword>(brn->get_out(i)) << i;
-
-    _cpu.write_bits(PA_DAT, PA00_DAT_BIT, value, brn->get_output_length());
+        usleep(100000);
+    }
 }

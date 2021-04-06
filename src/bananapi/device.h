@@ -24,9 +24,12 @@ namespace fs = std::experimental::filesystem;
 
 class device
 {
+    _word input_length = 1024;
+    _word output_length = 4;
+
     volatile bool stop = false;
 
-    gpio::cpu _cpu = gpio::cpu(BASE_ADDRESS_GPIO);
+    std::shared_ptr<gpio::cpu> _cpu;
 
     std::vector<std::shared_ptr<hc_sr04>> sensors;
 
@@ -34,7 +37,6 @@ class device
 
     std::unique_ptr<bnn::brain> brn;
     std::unique_ptr<bnn::brain_friend_dev> brn_frnd;
-    std::unique_ptr<std::thread> button_thread;
 
     std::shared_ptr<logger::logger> lgr = std::shared_ptr<logger::logger>(new logger::logger(logger::log_level_trace, (fs::current_path() / "log.txt").string()));
 
@@ -42,7 +44,7 @@ class device
     static void thread_button(device*);
     static void thread_led(device*);
     void read_sensor_state();
-    void write_motor_state();
+    static void write_motor_state(device* d);
 
 public:
     device();

@@ -33,13 +33,11 @@ std::string brain_friend_dev::get_state()
     for (_word i = 0; i < brain_.get_output_length(); i++)
         s += std::to_string(brain_.world_output[i]);
 
-    s += " init = ";
+    s += " qnp2 = " + std::to_string(brain_.quantity_of_neurons_in_power_of_two);
 
-    s += std::to_string(brain_.quantity_of_initialized_neurons_binary);
+    s += " init = " + std::to_string(brain_.quantity_of_initialized_neurons_binary);
 
-    s += " iter = ";
-
-    s += std::to_string(brain_.iteration);
+    s += " iter = " + std::to_string(brain_.iteration);
 
     return s;
 }

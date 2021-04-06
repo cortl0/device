@@ -10,6 +10,7 @@
 #define HC_SR04_H
 
 #include <chrono>
+#include <memory>
 
 #include <unistd.h>
 
@@ -32,31 +33,19 @@ class hc_sr04
     uword pin_trigger_dat_reg;
     uword pin_trigger_dat_bit;
 
-    // distance in centimeters
-    short distance;
-
-    gpio::cpu& _cpu;
+    std::shared_ptr<gpio::cpu> _cpu;
 
 public:
-    enum
-    {
-        hc_sr04_state_not_new_data = 0,
-        hc_sr04_state_in_work = 1,
-        hc_sr04_state_allow_new_data = 2,
-    } state;
-
     hc_sr04() = delete;
 
     hc_sr04(uword pin_echo_cfg_reg, uword pin_echo_cfg_bit,
             uword pin_echo_dat_reg, uword pin_echo_dat_bit,
             uword pin_trigger_cfg_reg, uword pin_trigger_cfg_bit,
             uword pin_trigger_dat_reg, uword pin_trigger_dat_bit,
-            gpio::cpu& _cpu);
+            std::shared_ptr<gpio::cpu> _cpu);
     
     // get the distance in centimeters
     short get_distance();
-
-    void run();
 };
 
 #endif // HC_SR04_H
