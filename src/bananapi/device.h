@@ -15,10 +15,12 @@
 #include <experimental/filesystem>
 #include <vector>
 
-#include "brain_friend_dev.h"
+#include "brain_tools_dev.h"
 #include "../gpio/src/board/bpi_p2_zero/bpi_p2_zero.h"
 #include "../logger/src/logger.h"
 #include "sensors/hc_sr04.h"
+
+#define logger_instance (*lgr)
 
 namespace fs = std::experimental::filesystem;
 
@@ -35,10 +37,10 @@ class device
 
     std::vector<short> distanses;
 
-    std::unique_ptr<bnn::brain> brn;
-    std::unique_ptr<bnn::brain_friend_dev> brn_frnd;
+    std::unique_ptr<bnn::brain_tools_dev> brain_;
 
-    std::shared_ptr<logger::logger> lgr = std::shared_ptr<logger::logger>(new logger::logger(logger::log_level_trace, (fs::current_path() / "log.txt").string()));
+    std::shared_ptr<logger::logger> lgr = std::shared_ptr<logger::logger>(new logger::logger(logger::logger::level::trace, (fs::current_path() / "log.txt").string()));
+    //logger::logger lgr = logger::logger(logger::logger::level::trace, (fs::current_path() / "log.txt").string());
 
     static void brain_clock_cycle_handler(void* owner);
     static void thread_button(device*);

@@ -9,11 +9,6 @@ bananapi for brain and sensors
 git clone --recursive https://github.com/cortl0/device
 ```
 
-## If not recursive cloned then project preparation
-```
-make prepare
-```
-
 ## Project directories & files
 
 #### ./src/arduino/
@@ -22,7 +17,7 @@ arduino sketch
 #### ./src/bananapi/
 bananapi project
 
-#### ./src/binary_neurons_network/
+#### ./src/bnn/
 Github repository
 https://github.com/cortl0/binary_neurons_network
 
@@ -38,7 +33,8 @@ https://github.com/cortl0/logger
 Unit test project
 
 ## ./device_schematic_diagram.drawio
-Schematic diagram of the device in drawio file format
+Schematic diagram of the device in drawio file format  
+https://app.diagrams.net/
 
 ## Build
 make  

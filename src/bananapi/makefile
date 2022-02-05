@@ -14,17 +14,19 @@ PREFIX = /opt/bnn_device
 
 SRCS = \
 main.cpp \
-../binary_neurons_network/src/brain/brain.cpp \
-../binary_neurons_network/src/brain_friend.cpp \
-../binary_neurons_network/src/brain/m_sequence.cpp \
-../binary_neurons_network/src/brain/neurons/binary.cpp \
-../binary_neurons_network/src/brain/neurons/neuron.cpp \
-../binary_neurons_network/src/brain/neurons/motor.cpp \
-../binary_neurons_network/src/brain/neurons/sensor.cpp \
-../binary_neurons_network/src/brain/random_put_get.cpp \
+../bnn/src/brain/brain.cpp \
+../bnn/src/brain_tools.cpp \
+../bnn/src/brain/m_sequence.cpp \
+../bnn/src/brain/neurons/binary.cpp \
+../bnn/src/brain/neurons/neuron.cpp \
+../bnn/src/brain/neurons/motor.cpp \
+../bnn/src/brain/neurons/sensor.cpp \
+../bnn/src/brain/random/random.cpp \
+../bnn/src/brain/storage.cpp \
+../bnn/src/brain/thread.cpp \
 ../gpio/src/cpu.cpp \
 ../logger/src/logger.cpp \
-./brain_friend_dev.cpp \
+./brain_tools_dev.cpp \
 ./device.cpp \
 ./sensors/hc_sr04.cpp
 

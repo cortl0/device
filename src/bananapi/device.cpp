@@ -36,24 +36,21 @@ device::device()
     });
 
     _word random_array_length_in_power_of_two = 24;
-    _word random_max_value_in_power_of_two = 31;
     _word quantity_of_neurons_in_power_of_two = 16;
 
-    brn.reset(new bnn::brain(random_array_length_in_power_of_two,
-                             random_max_value_in_power_of_two,
-                             quantity_of_neurons_in_power_of_two,
-                             input_length,
-                             output_length,
-                             brain_clock_cycle_handler));
-
-    brn_frnd.reset(new bnn::brain_friend_dev(*brn.get(), lgr));
+    brain_.reset(new bnn::brain_tools_dev(random_array_length_in_power_of_two,
+                                          quantity_of_neurons_in_power_of_two,
+                                          input_length,
+                                          output_length,
+                                          1,
+                                          lgr));
 
     // brain output to arduino input for motors
     _cpu->write_bits(PA_CFG0, PA00_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
     _cpu->write_bits(PA_CFG0, PA01_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
     _cpu->write_bits(PA_CFG0, PA02_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
     _cpu->write_bits(PA_CFG0, PA03_CFG_BIT, P_SELECT_OUTPUT, P_SELECT_LENGTH);
-    _cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
+    _cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, output_length);
 
     // stop and save button
     _cpu->write_bits(CON2_P10_CFG_REG, CON2_P10_CFG_BIT, P_SELECT_INPUT, P_SELECT_LENGTH);
@@ -83,11 +80,11 @@ void device::thread_button(device* d)
     {
         if(d->_cpu->read_bit(CON2_P10_DAT_REG, CON2_P10_DAT_BIT))
         {
-            d->lgr->logging(logger::log_level_information, sndr, "button down");
+            d->lgr->log(logger::logger::level::info, LOGGER_DATE_TIME_MESSAGE_PLACE_STRING("button down"));
 
-            d->brn_frnd->stop();
-            d->_cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, d->brn->get_output_length());
-            d->brn_frnd->save(d->lgr);
+            d->brain_->stop();
+            d->_cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, d->output_length);
+            d->brain_->save(d->lgr);
 
             while(d->_cpu->read_bit(CON2_P10_DAT_REG, CON2_P10_DAT_BIT));
 
@@ -113,7 +110,7 @@ void device::thread_led(device* d)
         pow_two = 0;
 
         for (_word i = 0; i < sizeof(_word) * 8 && !d->stop; i++)
-            if(d->brn_frnd->get_quantity_of_initialized_neurons_binary() & (1 << i))
+            if(d->brain_->get_quantity_of_initialized_neurons_binary() & (1 << i))
                 pow_two = i;
 
         for (_word i = 0; i < pow_two && !d->stop; i++)
@@ -148,20 +145,20 @@ void device::log_cycle()
             s += std::to_string(d) + "\t";
         });
 
-        lgr->logging(logger::log_level_trace, sndr, brn_frnd->get_state() + "\t" + s);
+        lgr->log(logger::logger::level::trace, LOGGER_DATE_TIME_MESSAGE_PLACE_STRING(brain_->get_state() + "\t" + s));
         count = 0;
     }
 }
 
 void device::run()
 {
-    _cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, brn->get_output_length());
+    _cpu->write_bits(PA_DAT, PA00_DAT_BIT, 0b0000, output_length);
 
-    brn_frnd->load(lgr);
+    brain_->load(lgr);
 
-    brn->start(this);
+    brain_->start();
 
-    lgr->logging(logger::log_level_information, sndr, "device started");
+    lgr->log(logger::logger::level::info, LOGGER_DATE_TIME_MESSAGE_PLACE_STRING("device started"));
 
     std::thread b(thread_button, this);
     b.detach();
@@ -176,7 +173,7 @@ void device::run()
 
     sleep(1);
 
-    lgr->logging(logger::log_level_information, sndr, "device stopped");
+    lgr->log(logger::logger::level::info, LOGGER_DATE_TIME_MESSAGE_PLACE_STRING("device stopped"));
 }
 
 void device::read_sensor_state()
@@ -211,7 +208,7 @@ void device::read_sensor_state()
             std::for_each(distanses.begin(), distanses.end(), [&](short d)
             {
                 for(_word j = 0; j < byte_length; j++)
-                    brn->set_in(i++, (d >> j) & 1);
+                    brain_->set_input(i++, (d >> j) & 1);
             });
     }
 }
@@ -224,10 +221,10 @@ void device::write_motor_state(device* d)
     {
         value = 0;
 
-        for(unsigned int i = 0; i < d->brn->get_output_length(); i++)
-            value |= static_cast<uword>(d->brn->get_out(i)) << i;
+        for(unsigned int i = 0; i < d->output_length; i++)
+            value |= static_cast<uword>(d->brain_->get_output(i)) << i;
 
-        d->_cpu->write_bits(PA_DAT, PA00_DAT_BIT, value, d->brn->get_output_length());
+        d->_cpu->write_bits(PA_DAT, PA00_DAT_BIT, value, d->output_length);
 
         usleep(100000);
     }

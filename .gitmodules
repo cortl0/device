@@ -1,5 +1,5 @@
 [submodule "binary_neurons_network"]
-	path = src/binary_neurons_network
+	path = src/bnn
 	url = https://github.com/cortl0/binary_neurons_network
 
 [submodule "gpio"]
